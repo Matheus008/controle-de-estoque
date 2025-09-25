@@ -1,0 +1,53 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql_container
+    environment:
+      MYSQL_ROOT_PASSWORD: 123
+      MYSQL_DATABASE: estoque_db
+      MYSQL_USER: admin
+      MYSQL_PASSWORD: 123
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: always
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    networks:
+      - private_network
+
+  controleestoqueapi:
+    build: ./controleestoqueapi
+    container_name: Controle_Estoque_API_container
+    environment:
+      SPRING_PROFILES_ACTIVE: prod
+      DB_HOST: mysql
+      DB_PORT: 3306
+      DB_NAME: estoque_db
+      DB_USER: admin
+      DB_PASSWORD: 123
+      JWT_SECRET: "prod-secret-key"
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mysql
+    restart: always
+    networks:
+      - public_network
+      - private_network
+
+volumes:
+  mysql_data:
+
+networks:
+  private_network:
+    driver: bridge
+  public_network:
+    driver: bridge

@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: estoqueapi
+
+  profiles:
+    active: dev
