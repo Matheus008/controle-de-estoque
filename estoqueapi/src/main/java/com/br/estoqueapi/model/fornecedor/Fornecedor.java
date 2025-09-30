@@ -1,17 +1,9 @@
 package com.br.estoqueapi.model.fornecedor;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 @Entity
 @Table(name = "fornecedor_tb")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
 public class Fornecedor {
 
     @Id
@@ -28,4 +20,36 @@ public class Fornecedor {
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo_fornecedor")
     private TipoFornecedor tipoFornecedor;
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getNomeFornecedor() {
+        return nomeFornecedor;
+    }
+
+    public void setNomeFornecedor(String nomeFornecedor) {
+        this.nomeFornecedor = nomeFornecedor;
+    }
+
+    public String getCpfOuCnpj() {
+        return cpfOuCnpj;
+    }
+
+    public void setCpfOuCnpj(String cpfOuCnpj) {
+        this.cpfOuCnpj = cpfOuCnpj;
+    }
+
+    public TipoFornecedor getTipoFornecedor() {
+        return tipoFornecedor;
+    }
+
+    public void setTipoFornecedor(TipoFornecedor tipoFornecedor) {
+        this.tipoFornecedor = tipoFornecedor;
+    }
 }
