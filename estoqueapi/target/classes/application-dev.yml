@@ -19,3 +19,8 @@ spring:
   data:
     mongodb:
       uri: mongodb://localhost:27017/estoque_dev_mongo
+
+api:
+  security:
+    token:
+      secret: ${JWT_SECRET:my-secret-key}
