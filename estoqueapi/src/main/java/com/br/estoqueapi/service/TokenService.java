@@ -22,7 +22,7 @@ public class TokenService {
         try{
             Algorithm algorithm = Algorithm.HMAC256(secret);
             String token = JWT.create()
-                    .withIssuer("estoque-api")
+                    .withIssuer("estoqueapi")
                     .withSubject(usuario.getUsername())
                     .withExpiresAt(genExpirationDate() )
                     .sign(algorithm);
@@ -36,7 +36,7 @@ public class TokenService {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
-                    .withIssuer("estoque-api")
+                    .withIssuer("estoqueapi")
                     .build()
                     .verify(token)
                     .getSubject();

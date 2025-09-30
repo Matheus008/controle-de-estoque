@@ -44,7 +44,9 @@ public class AutenticacaoController {
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Validated AutenticacaoDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
+        System.out.println("Passou pelo usernamePassword " + usernamePassword);
         var auth = this.authenticationManager.authenticate(usernamePassword);
+        System.out.println("Passou pelo auth" + auth);
 
         var token = tokenService.gerarToken((Usuario) auth.getPrincipal());
 
