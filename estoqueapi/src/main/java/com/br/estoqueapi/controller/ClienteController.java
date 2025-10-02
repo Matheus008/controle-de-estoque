@@ -1,6 +1,7 @@
 package com.br.estoqueapi.controller;
 
 import com.br.estoqueapi.dto.ClienteDTO;
+import com.br.estoqueapi.exceptions.ClienteNaoEncontradoException;
 import com.br.estoqueapi.model.cliente.Cliente;
 import com.br.estoqueapi.repository.ClienteRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -10,8 +11,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/cliente")
@@ -31,7 +30,6 @@ public class ClienteController {
     })
     @PostMapping("cadastrar")
     public Cliente cadastrar(@RequestBody @Valid ClienteDTO clienteDTO) {
-
         ClienteDTO dtoFormatado = ClienteDTO.of(
                 clienteDTO.nomeCliente(),
                 clienteDTO.cpfOuCnpj(),
@@ -54,7 +52,7 @@ public class ClienteController {
     })
     @DeleteMapping("{id}")
     public void deletar(@PathVariable("id") Long id) {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new ClienteNaoEncontradoException(id));
 
         clienteRepository.delete(cliente);
     }
@@ -66,7 +64,7 @@ public class ClienteController {
     })
     @PutMapping("{id}")
     public Cliente atualizar(@PathVariable("id") Long id,@RequestBody ClienteDTO clienteDTO) {
-        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        Cliente cliente = clienteRepository.findById(id).orElseThrow(() -> new ClienteNaoEncontradoException(id));
 
         ClienteDTO dtoFormatado = ClienteDTO.of(
                 clienteDTO.nomeCliente(),
@@ -88,7 +86,16 @@ public class ClienteController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @GetMapping
-    public List<Cliente> listarClientes() {
+    public Object listarClientes(@PathVariable(value = "id", required = false) Long id,
+                                 @PathVariable(value = "cpfOuCnpj", required = false) String cpfOuCnpj,
+                                 @PathVariable(value = "nomeCliente", required = false) String nomeCliente) {
+        if(id != null)
+            return clienteRepository.findById(id).orElseThrow(() -> new ClienteNaoEncontradoException(id));
+        if(cpfOuCnpj != null)
+            return clienteRepository.findByCpfOuCnpj(cpfOuCnpj).orElseThrow(() -> new ClienteNaoEncontradoException("cpfOuCnpj",cpfOuCnpj));
+        if(nomeCliente != null)
+            return clienteRepository.findByNomeCliente(nomeCliente).orElseThrow(() -> new ClienteNaoEncontradoException("nome", nomeCliente));
+
         return clienteRepository.findAll();
     }
 }

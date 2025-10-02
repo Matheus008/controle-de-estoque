@@ -4,11 +4,12 @@ import com.br.estoqueapi.model.cliente.Cliente;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ClienteRepository extends JpaRepository<Cliente, Long> {
 
-    List<Cliente> findByNomeCliente(String nomeCliente);
+    Optional<Cliente> findByNomeCliente(String nomeCliente);
 
-    String findByCpfOuCnpj(String cpfOuCnpj);
+    Optional<Cliente> findByCpfOuCnpj(String cpfOuCnpj);
 
 }
