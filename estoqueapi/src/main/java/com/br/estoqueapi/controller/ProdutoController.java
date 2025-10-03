@@ -1,6 +1,8 @@
 package com.br.estoqueapi.controller;
 
 import com.br.estoqueapi.dto.ProdutoDTO;
+import com.br.estoqueapi.exceptions.ProdutoNaoEncontradoException;
+import com.br.estoqueapi.exceptions.QuantidadeEstoqueNaoZeradoException;
 import com.br.estoqueapi.model.fornecedor.Fornecedor;
 import com.br.estoqueapi.model.produto.Produto;
 import com.br.estoqueapi.repository.FornecedorRepository;
@@ -19,9 +21,9 @@ import java.util.List;
 @Tag(name = "Produto", description = "Gerenciamento dos produtos")
 public class ProdutoController {
 
-    private ProdutoRepository produtoRepository;
-    private ProdutoService produtoService;
-    private FornecedorRepository fornecedorRepository;
+    private final ProdutoRepository produtoRepository;
+    private final ProdutoService produtoService;
+    private final FornecedorRepository fornecedorRepository;
 
     public ProdutoController(ProdutoRepository produtoRepository, ProdutoService produtoService, FornecedorRepository fornecedorRepository) {
         this.produtoRepository = produtoRepository;
@@ -46,10 +48,10 @@ public class ProdutoController {
     })
     @DeleteMapping("{id}")
     public void deletar(@PathVariable("id") Long id) {
-        Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        Produto produto = produtoRepository.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
 
         if (produto.getQuantidade() != 0) {
-            throw new IllegalArgumentException("O produto não pode ser excluido, deixe a quantidade do produto zerado!");
+            throw new QuantidadeEstoqueNaoZeradoException("O produto não pode ser excluido, deixe a quantidade do produto zerado!");
         } else {
             produtoRepository.deleteById(id);
         }
@@ -62,7 +64,7 @@ public class ProdutoController {
     })
     @PutMapping("{id}")
     public void atualizar(@PathVariable("id") Long id, @RequestBody ProdutoDTO produtoDTO) {
-        Produto produto = produtoRepository.findById(id).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        Produto produto = produtoRepository.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
 
         produto.setId(id);
         produto.setNome(produtoDTO.nome());
@@ -80,20 +82,12 @@ public class ProdutoController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @GetMapping
-    public List<Produto> buscar(@RequestParam(value = "nome", required = false) String nome) {
-        if (nome != null) {
-            return produtoRepository.findByNome(nome);
-        }
+    public Object buscar(@PathVariable(value = "nome", required = false) String nome,
+                         @PathVariable(value = "id", required = false) Long id) {
+        if (nome != null)
+            return produtoRepository.findByNome(nome).orElseThrow(() -> new ProdutoNaoEncontradoException("nome", nome));
+        if(id != null)
+            return produtoRepository.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
         return produtoRepository.findAll();
-    }
-
-    @Operation(summary = "Buscar produto por Id", description = "Buscar produto por Id no banco de dados.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Busca de produto por Id realizada com sucesso"),
-            @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
-    })
-    @GetMapping("/{id}")
-    public Produto buscarPorId(@PathVariable("id") Long id) {
-        return produtoRepository.findById(id).orElse(null);
     }
 }

@@ -31,4 +31,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleFornecedorNaoEncontradoException(FornecedorNaoEncontradoException exception) {
         return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
+
+    @ExceptionHandler(ProdutoNaoEncontradoException.class)
+    public ResponseEntity<Object> handleProdutoNaoEncontradoException(ProdutoNaoEncontradoException exception) {
+        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
+
+    @ExceptionHandler(QuantidadeEstoqueNaoZeradoException.class)
+    public ResponseEntity<Object> handleQuantidadeEstoqueNaoZeradoException(QuantidadeEstoqueNaoZeradoException exception) {
+        return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
 }
