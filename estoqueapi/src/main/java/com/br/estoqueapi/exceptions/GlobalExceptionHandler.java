@@ -26,4 +26,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleClienteNaoEncontradoException(ClienteNaoEncontradoException exception) {
         return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
     }
+
+    @ExceptionHandler(FornecedorNaoEncontradoException.class)
+    public ResponseEntity<Object> handleFornecedorNaoEncontradoException(FornecedorNaoEncontradoException exception) {
+        return buildResponse(HttpStatus.NOT_FOUND, exception.getMessage());
+    }
 }

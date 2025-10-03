@@ -1,6 +1,7 @@
 package com.br.estoqueapi.controller;
 
 import com.br.estoqueapi.dto.FornecedorDTO;
+import com.br.estoqueapi.exceptions.FornecedorNaoEncontradoException;
 import com.br.estoqueapi.model.fornecedor.Fornecedor;
 import com.br.estoqueapi.repository.FornecedorRepository;
 import io.swagger.v3.oas.annotations.Operation;
@@ -48,7 +49,7 @@ public class FornecedorController {
     })
     @DeleteMapping("{id}")
     public void deletar(@PathVariable("id") Long id) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new RuntimeException("Fornecedor não encontrado"));
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
 
         fornecedorRepository.delete(fornecedor);
     }
@@ -60,7 +61,7 @@ public class FornecedorController {
     })
     @PutMapping("{id}")
     public Fornecedor atualizar(@PathVariable("id") Long id, @RequestBody FornecedorDTO fornecedorDTO) {
-        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new RuntimeException("Fornecedor não encontrado!"));
+        Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
 
         FornecedorDTO dtoFormatado = FornecedorDTO.of(fornecedorDTO.nomeFornecedor(), fornecedorDTO.cpfOuCnpj(), fornecedorDTO.tipoFornecedor());
 
@@ -78,7 +79,17 @@ public class FornecedorController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @GetMapping
-    public List<Fornecedor> buscarTodos() {
+    public Object buscarTodos(@PathVariable(name = "id", required = false) Long id,
+                                        @PathVariable(name = "nomeFornecedor") String nomeFornecedor,
+                                        @PathVariable(name = "cpfOuCnpj", required = false) String cpfOuCnpj) {
+
+        if(id != null)
+            return fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
+        if(nomeFornecedor != null)
+            return fornecedorRepository.findByNomeFornecedor(nomeFornecedor).orElseThrow(() -> new FornecedorNaoEncontradoException("nome", nomeFornecedor));
+        if(cpfOuCnpj != null)
+            return fornecedorRepository.findByCpfOuCnpj(cpfOuCnpj).orElseThrow(() -> new FornecedorNaoEncontradoException("cpf ou cnpj", cpfOuCnpj));
+
         return fornecedorRepository.findAll();
     }
 }
