@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 @Tag(name = "Cliente", description = "Gerenciamento dos clientes.")
 public class ClienteController {
 
-    private ClienteRepository clienteRepository;
+    private final ClienteRepository clienteRepository;
 
     public ClienteController(ClienteRepository clienteRepository) {
         this.clienteRepository = clienteRepository;

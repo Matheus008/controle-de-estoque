@@ -41,4 +41,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Object> handleQuantidadeEstoqueNaoZeradoException(QuantidadeEstoqueNaoZeradoException exception) {
         return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
     }
+
+    @ExceptionHandler(QuantidadeMaiorQueEstoqueException.class)
+    public ResponseEntity<Object> handleQuantidadeMaiorQueEstoqueException(QuantidadeMaiorQueEstoqueException exception) {
+        return buildResponse(HttpStatus.BAD_REQUEST, exception.getMessage());
+    }
 }

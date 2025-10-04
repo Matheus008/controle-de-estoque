@@ -1,5 +1,8 @@
 package com.br.estoqueapi.service;
 
+import com.br.estoqueapi.exceptions.ClienteNaoEncontradoException;
+import com.br.estoqueapi.exceptions.ProdutoNaoEncontradoException;
+import com.br.estoqueapi.exceptions.QuantidadeMaiorQueEstoqueException;
 import com.br.estoqueapi.model.cliente.Cliente;
 import com.br.estoqueapi.model.movimentacao.Movimentacao;
 import com.br.estoqueapi.model.movimentacao.TipoMovimentacao;
@@ -15,10 +18,10 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class VendaService {
 
-    private ProdutoRepository produtoRepository;
-    private VendaRepository vendaRepository;
-    private MovimentacaoService movimentacaoService;
-    private ClienteRepository clienteRepository;
+    private final ProdutoRepository produtoRepository;
+    private final VendaRepository vendaRepository;
+    private final MovimentacaoService movimentacaoService;
+    private final ClienteRepository clienteRepository;
 
     public VendaService(ProdutoRepository produtoRepository,
                         VendaRepository vendaRepository,
@@ -32,20 +35,20 @@ public class VendaService {
 
     @Transactional
     public Venda registrarVenda(Long produtoId, int quantidade, Long clienteId, Usuario usuario) {
-        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
-        Cliente cliente =  clienteRepository.findById(clienteId).orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
+        Cliente cliente =  clienteRepository.findById(clienteId).orElseThrow(() -> new ClienteNaoEncontradoException(clienteId));
         String descricao = "Venda realizada para o cliente: " + cliente.getNomeCliente();
         Movimentacao movimentacao = movimentacaoService.registrarMovimentacao(produtoId, quantidade, TipoMovimentacao.SAIDA, descricao, usuario);
 
         if(produto.getQuantidade() < quantidade) {
-            throw new RuntimeException("Quantidade inválida");
+            throw new QuantidadeMaiorQueEstoqueException();
         }
 
 
         Venda venda = new Venda();
         venda.setUsuarioId(usuario.getId());
         venda.setQuantidade(quantidade);
-        venda.setValorTotalVendido((produto.getPreco() * quantidade) * 1.05); // provisório
+        venda.setValorTotalVendido((produto.getPreco() * quantidade) * 1.05); // provisório (valor que vai ser vendido)
         venda.setProdutoId(produto.getId());
         venda.setMovimentacaoId(movimentacao.getId());
         venda.setClienteId(cliente.getId());

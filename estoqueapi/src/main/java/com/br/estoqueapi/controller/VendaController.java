@@ -16,8 +16,8 @@ import java.security.Principal;
 @RequestMapping("/vendas")
 public class VendaController {
 
-    private VendaService vendaService;
-    private UsuarioRepository usuarioRepository;
+    private final VendaService vendaService;
+    private final UsuarioRepository usuarioRepository;
 
     public VendaController(VendaService vendaService, UsuarioRepository usuarioRepository) {
         this.vendaService = vendaService;

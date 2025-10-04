@@ -1,5 +1,6 @@
 package com.br.estoqueapi.service;
 
+import com.br.estoqueapi.exceptions.QuantidadeMaiorQueEstoqueException;
 import com.br.estoqueapi.model.movimentacao.Movimentacao;
 import com.br.estoqueapi.model.movimentacao.TipoMovimentacao;
 import com.br.estoqueapi.model.produto.Produto;
@@ -29,7 +30,7 @@ public class MovimentacaoService {
 
         if (tipoMovimentacao == TipoMovimentacao.SAIDA) {
             if (produto.getQuantidade() < quantidade) {
-                throw new RuntimeException("Quantidade de saida maior que o estoque!");
+                throw new QuantidadeMaiorQueEstoqueException();
             }
             produto.setQuantidade(produto.getQuantidade() - quantidade);
 
