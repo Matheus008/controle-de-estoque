@@ -81,13 +81,13 @@ public class ProdutoController {
             @ApiResponse(responseCode = "200", description = "Busca de produto realizada com sucesso"),
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
-    @GetMapping
-    public Object buscar(@PathVariable(value = "nome", required = false) String nome,
-                         @PathVariable(value = "id", required = false) Long id) {
-        if (nome != null)
-            return produtoRepository.findByNome(nome).orElseThrow(() -> new ProdutoNaoEncontradoException("nome", nome));
+    @GetMapping("/buscar")
+    public Object buscar(@RequestParam(value = "nome", required = false) String nome,
+                         @RequestParam(value = "id", required = false) Long id) {
         if(id != null)
             return produtoRepository.findById(id).orElseThrow(() -> new ProdutoNaoEncontradoException(id));
+        if (nome != null)
+            return produtoRepository.findByNome(nome);
         return produtoRepository.findAll();
     }
 }

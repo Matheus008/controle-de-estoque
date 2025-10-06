@@ -85,16 +85,16 @@ public class ClienteController {
             @ApiResponse(responseCode = "200", description = "Lista de clientes buscada com sucesso com sucesso"),
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
-    @GetMapping
-    public Object listarClientes(@PathVariable(value = "id", required = false) Long id,
-                                 @PathVariable(value = "cpfOuCnpj", required = false) String cpfOuCnpj,
-                                 @PathVariable(value = "nomeCliente", required = false) String nomeCliente) {
+    @GetMapping("/buscar")
+    public Object listarClientes(@RequestParam(value = "id", required = false) Long id,
+                                 @RequestParam(value = "cpfOuCnpj", required = false) String cpfOuCnpj,
+                                 @RequestParam(value = "nomeCliente", required = false) String nomeCliente) {
         if(id != null)
             return clienteRepository.findById(id).orElseThrow(() -> new ClienteNaoEncontradoException(id));
         if(cpfOuCnpj != null)
             return clienteRepository.findByCpfOuCnpj(cpfOuCnpj).orElseThrow(() -> new ClienteNaoEncontradoException("cpfOuCnpj",cpfOuCnpj));
         if(nomeCliente != null)
-            return clienteRepository.findByNomeCliente(nomeCliente).orElseThrow(() -> new ClienteNaoEncontradoException("nome", nomeCliente));
+            return clienteRepository.findByNomeCliente(nomeCliente);
 
         return clienteRepository.findAll();
     }

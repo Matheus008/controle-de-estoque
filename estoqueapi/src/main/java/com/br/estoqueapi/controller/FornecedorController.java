@@ -78,15 +78,15 @@ public class FornecedorController {
             @ApiResponse(responseCode = "200", description = "Fornecedores buscado com sucesso"),
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
-    @GetMapping
-    public Object buscarTodos(@PathVariable(name = "id", required = false) Long id,
-                                        @PathVariable(name = "nomeFornecedor") String nomeFornecedor,
-                                        @PathVariable(name = "cpfOuCnpj", required = false) String cpfOuCnpj) {
+    @GetMapping("/buscar")
+    public Object buscar(@RequestParam(name = "id", required = false) Long id,
+                                        @RequestParam(name = "nomeFornecedor", required = false) String nomeFornecedor,
+                                        @RequestParam(name = "cpfOuCnpj", required = false) String cpfOuCnpj) {
 
         if(id != null)
             return fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
         if(nomeFornecedor != null)
-            return fornecedorRepository.findByNomeFornecedor(nomeFornecedor).orElseThrow(() -> new FornecedorNaoEncontradoException("nome", nomeFornecedor));
+            return fornecedorRepository.findByNomeFornecedor(nomeFornecedor);
         if(cpfOuCnpj != null)
             return fornecedorRepository.findByCpfOuCnpj(cpfOuCnpj).orElseThrow(() -> new FornecedorNaoEncontradoException("cpf ou cnpj", cpfOuCnpj));
 

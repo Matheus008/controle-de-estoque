@@ -15,6 +15,8 @@ import com.br.estoqueapi.repository.VendaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 public class VendaService {
 
@@ -44,13 +46,13 @@ public class VendaService {
             throw new QuantidadeMaiorQueEstoqueException();
         }
 
-
         Venda venda = new Venda();
         venda.setUsuarioId(usuario.getId());
         venda.setQuantidade(quantidade);
         venda.setValorTotalVendido((produto.getPreco() * quantidade) * 1.05); // provisório (valor que vai ser vendido)
         venda.setProdutoId(produto.getId());
         venda.setMovimentacaoId(movimentacao.getId());
+        venda.setDataVenda(LocalDateTime.now());
         venda.setClienteId(cliente.getId());
 
         return  vendaRepository.save(venda);

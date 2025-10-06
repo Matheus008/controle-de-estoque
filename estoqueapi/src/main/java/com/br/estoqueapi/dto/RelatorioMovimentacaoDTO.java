@@ -5,7 +5,7 @@ import com.br.estoqueapi.model.movimentacao.TipoMovimentacao;
 import java.time.LocalDateTime;
 
 public record RelatorioMovimentacaoDTO(
-        Long id,
+        String id,
         String produtoNome,
         int quantidade,
         TipoMovimentacao tipoMovimentacao,

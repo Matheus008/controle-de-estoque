@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Venda {
 
     @Id
-    private Long id;
+    private String id;
 
     private Long usuarioId;
 
@@ -19,22 +19,17 @@ public class Venda {
 
     private Long produtoId;
 
-    private Long movimentacaoId;
+    private String movimentacaoId;
 
     private Long clienteId;
 
     private LocalDateTime dataVenda;
 
-    @PrePersist
-    public void prePesrsist() {
-        this.dataVenda = LocalDateTime.now();
-    }
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -70,11 +65,11 @@ public class Venda {
         this.produtoId = produtoId;
     }
 
-    public Long getMovimentacaoId() {
+    public String getMovimentacaoId() {
         return movimentacaoId;
     }
 
-    public void setMovimentacaoId(Long movimentacaoId) {
+    public void setMovimentacaoId(String movimentacaoId) {
         this.movimentacaoId = movimentacaoId;
     }
 

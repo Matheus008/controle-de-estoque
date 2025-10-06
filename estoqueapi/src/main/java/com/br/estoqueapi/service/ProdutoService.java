@@ -1,5 +1,6 @@
 package com.br.estoqueapi.service;
 
+import com.br.estoqueapi.exceptions.FornecedorNaoEncontradoException;
 import com.br.estoqueapi.model.fornecedor.Fornecedor;
 import com.br.estoqueapi.model.produto.Produto;
 import com.br.estoqueapi.repository.FornecedorRepository;
@@ -20,7 +21,7 @@ public class ProdutoService {
 
     @Transactional
     public Produto registrarProduto(String nome, String descricao, Double preco, Long idFornecedor) {
-        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(() -> new RuntimeException("Fornecedor não encontrado!"));
+        Fornecedor fornecedor = fornecedorRepository.findById(idFornecedor).orElseThrow(() -> new FornecedorNaoEncontradoException(idFornecedor));
 
         Produto produto = new Produto();
         produto.setNome(nome);

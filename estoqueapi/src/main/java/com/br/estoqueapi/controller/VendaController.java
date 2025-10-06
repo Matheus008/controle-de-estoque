@@ -27,7 +27,6 @@ public class VendaController {
     @PostMapping
     public Venda registrar(@RequestBody VendasDTO vendasDTO, Principal principal) {
         Usuario usuario = (Usuario) usuarioRepository.findByEmail(principal.getName());
-
         return vendaService.registrarVenda(vendasDTO.produtoId(),
                 vendasDTO.quantidade(), vendasDTO.clienteId(), usuario);
     }

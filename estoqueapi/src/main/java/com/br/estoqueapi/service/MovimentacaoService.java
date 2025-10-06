@@ -1,5 +1,6 @@
 package com.br.estoqueapi.service;
 
+import com.br.estoqueapi.exceptions.ProdutoNaoEncontradoException;
 import com.br.estoqueapi.exceptions.QuantidadeMaiorQueEstoqueException;
 import com.br.estoqueapi.model.movimentacao.Movimentacao;
 import com.br.estoqueapi.model.movimentacao.TipoMovimentacao;
@@ -9,6 +10,8 @@ import com.br.estoqueapi.repository.MovimentacaoRepository;
 import com.br.estoqueapi.repository.ProdutoRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 public class MovimentacaoService {
@@ -26,7 +29,7 @@ public class MovimentacaoService {
 
     @Transactional
     public Movimentacao registrarMovimentacao(Long produtoId, int quantidade, TipoMovimentacao tipoMovimentacao, String descricao, Usuario usuario) {
-        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new RuntimeException("Produto não encontrado"));
+        Produto produto = produtoRepository.findById(produtoId).orElseThrow(() -> new ProdutoNaoEncontradoException(produtoId));
 
         if (tipoMovimentacao == TipoMovimentacao.SAIDA) {
             if (produto.getQuantidade() < quantidade) {
@@ -44,6 +47,7 @@ public class MovimentacaoService {
         movimentacao.setTipoMovimentacao(tipoMovimentacao);
         movimentacao.setDescricao(descricao);
         movimentacao.setUsuarioId(usuario.getId());
+        movimentacao.setDataHora(LocalDateTime.now());
 
 
         produto.setValorTotal(produtoService.calcularValorTotal(produto.getQuantidade(), produto.getPreco()));

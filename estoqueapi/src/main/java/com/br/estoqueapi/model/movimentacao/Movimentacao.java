@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 public class Movimentacao {
 
     @Id
-    private Long id;
+    private String id;
 
     private int quantidade;
 
@@ -23,16 +23,11 @@ public class Movimentacao {
 
     private LocalDateTime dataHora;
 
-    @PrePersist
-    public void prePesrsist() {
-        this.dataHora = LocalDateTime.now();
-    }
-
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
