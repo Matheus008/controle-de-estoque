@@ -6,7 +6,7 @@ import org.springframework.data.mongodb.repository.MongoRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public interface VendaRepository extends MongoRepository<Venda, Long> {
+public interface VendaRepository extends MongoRepository<Venda, String> {
 
     List<Venda> findByDataVendaBetween(LocalDateTime inicio, LocalDateTime fim);
     List<Venda> findByDataVendaAfter(LocalDateTime inicio);
