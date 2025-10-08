@@ -1,15 +1,21 @@
 package com.br.estoqueapi.controller;
 
 import com.br.estoqueapi.dto.FornecedorDTO;
+import com.br.estoqueapi.dto.LogAcoesRequestDTO;
 import com.br.estoqueapi.exceptions.FornecedorNaoEncontradoException;
 import com.br.estoqueapi.model.fornecedor.Fornecedor;
+import com.br.estoqueapi.model.usuario.Usuario;
 import com.br.estoqueapi.repository.FornecedorRepository;
+import com.br.estoqueapi.repository.UsuarioRepository;
+import com.br.estoqueapi.service.LogAcoesService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
@@ -18,9 +24,13 @@ import java.util.List;
 public class FornecedorController {
 
     private final FornecedorRepository fornecedorRepository;
+    private final LogAcoesService logAcoesService;
+    private final UsuarioRepository usuarioRepository;
 
-    public FornecedorController(FornecedorRepository fornecedorRepository) {
+    public FornecedorController(FornecedorRepository fornecedorRepository, LogAcoesService logAcoesService, UsuarioRepository usuarioRepository) {
         this.fornecedorRepository = fornecedorRepository;
+        this.logAcoesService = logAcoesService;
+        this.usuarioRepository = usuarioRepository;
     }
 
     @Operation(summary = "Cadastrar fornecedor", description = "cadastrar fornecedor no banco de dados")
@@ -29,8 +39,9 @@ public class FornecedorController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @PostMapping
-    public Fornecedor cadastrar(@RequestBody FornecedorDTO fornecedorDTO) {
+    public Fornecedor cadastrar(@RequestBody FornecedorDTO fornecedorDTO, Principal principal) {
         FornecedorDTO dtoFormatado = FornecedorDTO.of(fornecedorDTO.nomeFornecedor(), fornecedorDTO.cpfOuCnpj(), fornecedorDTO.tipoFornecedor());
+        Usuario usuario = (Usuario) usuarioRepository.findByEmail(principal.getName());
 
         Fornecedor fornecedor = new Fornecedor();
         fornecedor.setNomeFornecedor(dtoFormatado.nomeFornecedor());
@@ -38,6 +49,14 @@ public class FornecedorController {
         fornecedor.setTipoFornecedor(dtoFormatado.tipoFornecedor());
 
         fornecedorRepository.save(fornecedor);
+
+        logAcoesService.registrarLogAcao(new LogAcoesRequestDTO(
+                usuario.getId(),
+                "REGISTRAR_FORNECEDOR",
+                LocalDateTime.now(),
+                "Fornecedor",
+                fornecedor.getId()
+        ));
 
         return fornecedor;
     }
@@ -48,10 +67,19 @@ public class FornecedorController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @DeleteMapping("{id}")
-    public void deletar(@PathVariable("id") Long id) {
+    public void deletar(@PathVariable("id") Long id, Principal principal) {
         Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
+        Usuario usuario = (Usuario) usuarioRepository.findByEmail(principal.getName());
 
         fornecedorRepository.delete(fornecedor);
+
+        logAcoesService.registrarLogAcao(new LogAcoesRequestDTO(
+                usuario.getId(),
+                "DELETAR_FORNECEDOR",
+                LocalDateTime.now(),
+                "Fornecedor",
+                fornecedor.getId()
+        ));
     }
 
     @Operation(summary = "Atualizar fornecedor", description = "atualizar fornecedor no banco de dados")
@@ -60,8 +88,9 @@ public class FornecedorController {
             @ApiResponse(responseCode = "403", description = "Não tem permissão para executar essa ação")
     })
     @PutMapping("{id}")
-    public Fornecedor atualizar(@PathVariable("id") Long id, @RequestBody FornecedorDTO fornecedorDTO) {
+    public Fornecedor atualizar(@PathVariable("id") Long id, @RequestBody FornecedorDTO fornecedorDTO, Principal principal) {
         Fornecedor fornecedor = fornecedorRepository.findById(id).orElseThrow(() -> new FornecedorNaoEncontradoException(id));
+        Usuario usuario = (Usuario) usuarioRepository.findByEmail(principal.getName());
 
         FornecedorDTO dtoFormatado = FornecedorDTO.of(fornecedorDTO.nomeFornecedor(), fornecedorDTO.cpfOuCnpj(), fornecedorDTO.tipoFornecedor());
 
@@ -70,7 +99,17 @@ public class FornecedorController {
         fornecedor.setCpfOuCnpj(dtoFormatado.cpfOuCnpj());
         fornecedor.setTipoFornecedor(dtoFormatado.tipoFornecedor());
 
-        return fornecedorRepository.save(fornecedor);
+        fornecedorRepository.save(fornecedor);
+
+        logAcoesService.registrarLogAcao((new LogAcoesRequestDTO(
+                usuario.getId(),
+                "ALTERAR_FORNECEDOR",
+                LocalDateTime.now(),
+                "Fornecedor",
+                fornecedor.getId()
+        )));
+
+        return fornecedor;
     }
 
     @Operation(summary = "Buscar todos os fornecedores", description = "buscar todos os fornecedores no banco de dados")
